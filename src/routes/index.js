@@ -20,6 +20,7 @@ const strategicKPI = require("./strategicKPI");
 const brainTrust = require("./brainTrust");
 const idea = require("./idea");
 const profile = require("./profile");
+const service = require("./service");
 
 router.use("/admin", admin);
 router.use("/pipeline", auth , pipeline);
@@ -36,6 +37,7 @@ router.use("/strategicKPI", strategicKPI);
 router.use("/brainTrust", brainTrust);
 router.use("/idea", idea);
 router.use("/profile", profile);
+router.use("/service", service);
 
 router.post("/upload", async(req, res, next) => {
     try{

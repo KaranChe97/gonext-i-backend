@@ -11,9 +11,18 @@ const adminSchema = new mongoose.Schema({
     password : {
         type : String
     },
+    company : {
+        type : String
+    },
+    address : {
+        type : String
+    },
     role : {
         type : String,
-        enum : ["superAdmin","admin","user"]
+        enum : ["superAdmin","admin","user"] 
+    },
+    verified : {
+        type : Boolean
     }
 },{
     timestamps : true

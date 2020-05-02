@@ -35,7 +35,7 @@ app.use((e, req, res, next) => {
     e.message = e.message || 'server error ';
     console.log(e);
     res.status(e.status).json({
-        status: false,
+        status: e.errCode || false,
         message: e.message,
         error: e,
     });
