@@ -40,10 +40,16 @@ admin.login = async (req, res, next) => {
                     }
                 });
             } else {
-                throw new Error("incorrect password"); 
+                res.status(200).json({
+                    status: false,
+                    message : 'Incorrect Password',
+                })
             }            
         } else {
-            throw new Error("Account not exist. Please signup.");
+            res.status(200).json({
+                status: false,
+                message: 'Account not exist. Please signup.'
+            })
         }
     } catch(e){
         if(e.code === 'ERR_ASSERTION') {
