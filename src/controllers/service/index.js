@@ -33,6 +33,7 @@ service.sendOtp = async (req, res, next) => {
                   console.log("hashed token", otpToken)
                   res.status(200).send({ 
                       status: 1,
+                      type: req.body.type,
                       otpToken: otpToken
                 }) 
               }
@@ -50,7 +51,7 @@ service.receiveOtp = async (req,res,next) => {
         if(validCode) {
             isVerified = true;
         } 
-        res.send({ status : 200, isVerified : isVerified });
+        res.send({ status : 200, isVerified : isVerified, type: req.body.type });
     } catch(e) {
         next(e);
     }
