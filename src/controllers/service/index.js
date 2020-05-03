@@ -1,10 +1,5 @@
 const assert = require("assert");
-const accountSid = process.env.TWILIO_SID; 
-console.log(accountSid)
-const authToken = process.env.TWILIO_AUTH;
 const client = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
-const { getAll, getOne, getByID, createOne, edit, deleteOne } = require("../../model/service");
-const serviceModel = require("../../model/service/model");
 const { generateHash , compareData } = require("../../common/hash");
 
 const service = {};
@@ -15,8 +10,7 @@ var rand = function(low, high) {
 service.sendOtp = async (req, res, next) => {
     try {
         console.log('SendOtp called');
-        var verificationCode = rand(100000, 999999);
-
+        var verificationCode = rand(1000, 9999);
         var params = {
             to: `+91${req.body.phonenumber}`,
             from: '+12057406474', // Your twilio phone number
@@ -30,7 +24,6 @@ service.sendOtp = async (req, res, next) => {
                   console.log(err);
                   res.status(200).send(err);
               } else {
-                  console.log("hashed token", otpToken)
                   res.status(200).send({ 
                       status: 1,
                       type: req.body.type,

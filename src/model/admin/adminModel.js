@@ -10,7 +10,7 @@ const adminSchema = new mongoose.Schema({
     },
     password : {
         type : String
-    },
+    }, 
     company : {
         type : String
     },
@@ -24,8 +24,8 @@ const adminSchema = new mongoose.Schema({
     verified : {
         type : Boolean
     }
-},{
-    timestamps : true
+    },{        
+        timestamps : true
 });
 
 adminSchema.pre("save" , async function(next){
