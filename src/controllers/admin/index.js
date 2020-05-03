@@ -9,7 +9,7 @@ admin.getAll = async (req, res, next) => {
     try{
         const data = await getAll();
         res.status(200).json({
-            status : true,
+            status : 1,
             message : "success",
             data
         });
@@ -32,7 +32,7 @@ admin.login = async (req, res, next) => {
             if(isPasswordSame){
                 const token = await generateToken(data._doc);
                 res.status(200).json({
-                    status : true,
+                    status : 1,
                     message : "success",
                     data : {
                         user : data,
@@ -41,13 +41,13 @@ admin.login = async (req, res, next) => {
                 });
             } else {
                 res.status(200).json({
-                    status: false,
+                    status: 0,
                     message : 'Incorrect Password',
                 })
             }            
         } else {
             res.status(200).json({
-                status: false,
+                status: 2,
                 message: 'Account not exist. Please signup.'
             })
         }
@@ -64,7 +64,7 @@ admin.getOne = async (req, res, next) => {
         console.log(req);
         const data = await getByID(req.params.adminID);
         res.status(200).json({
-            status : true,
+            status : 1,
             message : "success",
             data
         });
@@ -82,11 +82,14 @@ admin.create = async (req, res, next) => {
         assert(req.body.name, "Name is required");
         const isExist = await getOne(req.body.phonenumber);
         if(isExist) {
-            throw new Error('Phone number already exist.');
+            res.status(200).json({
+                status: 0,
+                message: 'Phone number already exist.'
+            })
         }
         const data = await createOne(req.body);
         res.status(200).json({
-            status : true, 
+            status : 1, 
             message : "success",
             data
         });
@@ -105,7 +108,7 @@ admin.edit = async (req, res, next) => {
     try{
         const data = await edit(req.params.adminID, req.body);
         res.status(200).json({
-            status : true,
+            status : 1,
             message : "success",
             data
         });
@@ -118,7 +121,7 @@ admin.deleteOne = async (req, res, next) => {
     try{
         const data = await deleteOne(req.params.adminID);
         res.status(200).json({
-            status : true,
+            status : 1,
             message : "success",
             data
         });

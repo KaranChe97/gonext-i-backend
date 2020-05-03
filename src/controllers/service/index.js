@@ -1,7 +1,8 @@
 const assert = require("assert");
-const accountSid = 'ACf5e51b0117f3f5a4b3a092919ef0d7ec';
-const authToken = 'c1b2794c623162533876e929482c1490';
-const client = require('twilio')(accountSid, authToken);
+const accountSid = process.env.TWILIO_SID; 
+console.log(accountSid)
+const authToken = process.env.TWILIO_AUTH;
+const client = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
 const { getAll, getOne, getByID, createOne, edit, deleteOne } = require("../../model/service");
 const serviceModel = require("../../model/service/model");
 const { generateHash , compareData } = require("../../common/hash");
@@ -27,10 +28,13 @@ service.sendOtp = async (req, res, next) => {
           client.messages.create(params, (err, message) => {
               if(err) {
                   console.log(err);
-                  res.status(500).send(err);
+                  res.status(200).send(err);
               } else {
                   console.log("hashed token", otpToken)
-                  res.status(200).send({ otpToken: otpToken }) 
+                  res.status(200).send({ 
+                      status: 1,
+                      otpToken: otpToken
+                }) 
               }
           })       
 
