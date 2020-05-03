@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { getAll, getOne, getByID, createOne, edit, deleteOne } = require("../../model/admin");
+const { getAll, getOne, getByID, createOne, edit, deleteOne, } = require("../../model/admin");
 const { generateToken } = require("../../common/token");
 const { compareData, generateHash } = require("../../common/hash");
 
@@ -124,6 +124,24 @@ admin.deleteOne = async (req, res, next) => {
             message : "success",
             data
         });
+    }catch(e){
+        next(e);
+    }
+};
+
+admin.deleteAdmin = async (req, res, next) => {
+    try{
+        assert(req.body.phonenumber, "phonenumber is required");
+        console.log(req.body.phonenumber);
+        const data = await getOne(req.body.phonenumber);
+        if(data) {
+            const deleted = await deleteOne(data._id);            
+            res.status(200).json({
+                status : 1,
+                message : "successfully deleted",
+                deleted
+            });
+        }
     }catch(e){
         next(e);
     }

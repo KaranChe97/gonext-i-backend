@@ -23,7 +23,7 @@ const adminSchema = new mongoose.Schema({
     },
     verified : {
         type : Boolean
-    }
+    } 
     },{        
         timestamps : true
 });
