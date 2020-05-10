@@ -3,20 +3,20 @@ const multer = require('multer');
 const multerS3 = require('multer-s3');
 
 aws.config.update({
-    accessKeyId: "AKIAZYQSBSGQ6DKW4ZJ2",
-    secretAccessKey: "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",
-    region: "ap-southeast-1",
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
 });
 
-const s3 = new aws.S3();
+const s3 = new aws.S3(); 
 
 const maxCount = 100;
-
+ 
 const upload = async (req, res) => {
     const uploadFile = multer({
         storage: multerS3({
             s3,
-            bucket: "boringcodecompany",
+            bucket: "gonext-i-media",
             acl: 'public-read',
             contentType: multerS3.AUTO_CONTENT_TYPE,
             metadata(req, file, cb) {

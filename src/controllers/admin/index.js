@@ -60,14 +60,14 @@ admin.login = async (req, res, next) => {
 
 admin.getOne = async (req, res, next) => {
     try{
-        const data = await getByID(req.params.adminID);
+        const data = await getByID(req.body.gonextId);
         res.status(200).json({
             status : 1,
             message : "success",
             data
         });
     }catch(e){
-        next(e);
+        next(e); 
     } 
 };
 
@@ -86,9 +86,12 @@ admin.create = async (req, res, next) => {
             })
         } else {
             const data = await createOne(req.body);
+            const token = await generateToken(data._doc);
+
             res.status(200).json({
                 status : 1, 
                 message : "success",
+                token,
                 data
             });
         }       
@@ -105,7 +108,7 @@ admin.create = async (req, res, next) => {
 
 admin.edit = async (req, res, next) => {
     try{
-        const data = await edit(req.params.adminID, req.body);
+        const data = await edit(req.body.gonextId, req.body);
         res.status(200).json({
             status : 1,
             message : "success",
@@ -117,8 +120,8 @@ admin.edit = async (req, res, next) => {
 };
  
 admin.deleteOne = async (req, res, next) => {
-    try{
-        const data = await deleteOne(req.params.adminID);
+    try{ 
+        const data = await deleteOne(req.body.gonextId);
         res.status(200).json({
             status : 1,
             message : "success",
@@ -141,6 +144,11 @@ admin.deleteAdmin = async (req, res, next) => {
                 message : "successfully deleted",
                 deleted
             });
+        } else {
+            res.status(200).json({
+                status: 2,
+                message: 'account not found'
+            })
         }
     }catch(e){
         next(e);
@@ -151,13 +159,13 @@ admin.changePassword = async (req, res, next) => {
     try {
         assert(req.body.password, "current password is required");
         assert(req.body.newPassword, "New Password is required");
-        const data = await getByID(req.params.adminID);
+        const data = await getByID(req.body.gonextId); 
         if(data){
         const {password, newPassword} = req.body;
         let validPassword = await compareData(password, data.password);
         if(validPassword) {
             data.password = await generateHash(newPassword);
-            var saveData =  await edit(req.params.adminID, data);
+            var saveData =  await edit(req.body.gonextId, data);
             if(saveData) {
                 res.status(200).json({
                     status: 1,
@@ -166,9 +174,9 @@ admin.changePassword = async (req, res, next) => {
                 })
             }
         } else {
-            res.status(200).json({
+            res.status(200).json({ 
                 status: 0,
-                message: "Incorrect password"
+                message: "Incorrect password"  
             })
         }
     } else {

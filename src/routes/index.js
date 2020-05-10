@@ -36,11 +36,11 @@ router.use("/finance", finance);
 router.use("/strategicKPI", strategicKPI);
 router.use("/brainTrust", brainTrust);
 router.use("/idea", idea);
-router.use("/profile", profile);
+router.use("/profile",auth, profile);
 router.use("/service", service);
 
 router.post("/upload", async(req, res, next) => {
-    try{
+    try{ 
         var response = await upload(req, res);
         res.status(200).json({
             status : true,

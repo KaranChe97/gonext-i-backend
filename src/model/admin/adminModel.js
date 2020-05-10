@@ -17,6 +17,9 @@ const adminSchema = new mongoose.Schema({
     address : {
         type : String
     },
+    profilePic : {
+        type : String
+    },
     role : {
         type : String,
         enum : ["superAdmin","admin","user"] 

@@ -5,9 +5,9 @@ const auth = async (req, res, next) => {
 	try {
 		let token = req.headers["x-access-token"] || req.headers.authorization; // Express headers are auto converted to lowercase
 		// console.log(token);
-		if (token && token.startsWith("bearer ")) {
-			// Remove Bearer from string
-			token = token.slice(7, token.length);
+		if (token && token.startsWith("Bearer ")) {
+			// Remove Bearer from string 
+			token = token.slice(7, token.length); 
 			if (token) {
 				const data = jwt.verify(token, "cb$2%#nldvejrLootahHoldingngjrtui432y7ryfhneroafjslk093irosd812ewi");
 				// eslint-disable-next-line no-underscore-dangle
@@ -27,7 +27,7 @@ const auth = async (req, res, next) => {
 		} else {
 			throw new Error("Auth token is not supplied");
 		}
-	} catch (e) {
+	} catch (e) { 
 		res.status(401).json({
 			status : false,
 			message : e.message || "NOT AUTHORIED"
