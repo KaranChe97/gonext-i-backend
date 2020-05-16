@@ -13,6 +13,7 @@ const s3 = new aws.S3();
 const maxCount = 100;
  
 const upload = async (req, res) => {
+    console.log(req);
     const uploadFile = multer({
         storage: multerS3({
             s3,

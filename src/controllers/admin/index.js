@@ -72,12 +72,13 @@ admin.getOne = async (req, res, next) => {
 };
 
 admin.create = async (req, res, next) => {
-    try{
+    try{ 
         console.log('create api', req.body)
         assert(req.body.phonenumber, "phonenumber is required");
         assert(req.body.password, "password is required");
         assert(req.body.role, "role is required");
         assert(req.body.name, "Name is required");
+        assert(req.body.address, "Address is required");
         const isExist = await getOne(req.body.phonenumber);
         if(isExist) {
             res.status(200).json({
@@ -108,6 +109,9 @@ admin.create = async (req, res, next) => {
 
 admin.edit = async (req, res, next) => {
     try{
+        assert(req.body.phonenumber, "phonenumber is required");
+        assert(req.body.name, "name is required");
+        assert(req.body.address, "address is required");
         const data = await edit(req.body.gonextId, req.body);
         res.status(200).json({
             status : 1,
@@ -115,6 +119,9 @@ admin.edit = async (req, res, next) => {
             data
         });
     }catch(e){
+        if(e.code === 'ERR_ASSERTION') {
+            e.status = 200;
+        }
         next(e);
     }
 };

@@ -42,8 +42,9 @@ router.use("/service", service);
 router.post("/upload", async(req, res, next) => {
     try{ 
         var response = await upload(req, res);
+        
         res.status(200).json({
-            status : true,
+            status : 1,
             message : "success",
             data : response.length > 0 && response[0].location ? response[0].location : ""
         });
