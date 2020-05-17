@@ -13,7 +13,6 @@ const s3 = new aws.S3();
 const maxCount = 100;
  
 const upload = async (req, res) => {
-    console.log(req);
     const uploadFile = multer({
         storage: multerS3({
             s3,
@@ -24,6 +23,7 @@ const upload = async (req, res) => {
                 cb(null, { fieldName: file.fieldname });
             },
             key(req, file, cb) {
+                console.log("file", file);
                 const extension = `${Date.now()}_${file.originalname}`;
                 cb(null, extension);
             },

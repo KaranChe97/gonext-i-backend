@@ -19,10 +19,9 @@ service.sendOtp = async (req, res, next) => {
             from: '+12057406474', // Your twilio phone number
             body: `Your verification code for gonext-i is ${verificationCode}`,
           };
+        const data = await getOne(req.body.phonenumber);
         if(req.body.type === 'forget') {
-            const data = await getOne(req.body.phonenumber);
             if(data) {
-                console.log(data);
                 client.messages.create(params, (err, message) => {
                     if(err) {
                         console.log(err);
@@ -42,6 +41,12 @@ service.sendOtp = async (req, res, next) => {
                 })
             }
         } else if(req.body.type === 'signup') {
+            if(data) {
+                res.status(200).send({
+                    status : 2,
+                    message: 'Account already exist'
+                })
+            } else {
           client.messages.create(params, (err, message) => {
               if(err) {
                   console.log(err);
@@ -54,6 +59,7 @@ service.sendOtp = async (req, res, next) => {
                 }) 
               }
           })       
+        }
         } else {
             res.status(200).send({
                 status: 0,
