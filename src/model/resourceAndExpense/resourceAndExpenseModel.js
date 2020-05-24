@@ -6,7 +6,7 @@ const resourceAndExpenseSchema = new mongoose.Schema({
         enum : ["LRED","CPL","LBS","TRI-C","LGC","SSLH"]
     },
     year : {
-        type : Number
+        type : Number 
     },
     totalEmployees : {
         type : Number
