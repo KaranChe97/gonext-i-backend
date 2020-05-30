@@ -6,38 +6,14 @@ const assert = require("assert");
 const { upload, deleteFile } = require("../common/s3Upload");
 
 const admin = require("./admin");
-const pipeline = require("./pipeline");
-const operationalMetric = require("./operationalMetric");
-const basicMeasure = require("./basicMeasure");
-const competitiveAdvantage = require("./competitiveAdvantage");
-const valueChain = require("./valueChain");
-const resourceAndExpense = require("./resourceAndExpense");
-const boardEffectiveness = require("./boardEffectiveness");
-const boardMemberReview = require("./boardMemberReview");
-const inventory = require("./inventory");
-const finance = require("./finance");
-const strategicKPI = require("./strategicKPI");
-const brainTrust = require("./brainTrust");
-const idea = require("./idea");
-const profile = require("./profile");
 const service = require("./service");
+const inventory = require("./inventory");
+const myUsers = require("./myUsers");
 
 router.use("/admin", admin);
-router.use("/pipeline", auth , pipeline);
-router.use("/operationalMetric", auth, operationalMetric);
-router.use("/basicMeasure", auth, basicMeasure);
-router.use("/competitiveAdvantage", competitiveAdvantage);
-router.use("/valueChain", valueChain);
-router.use("/resourceAndExpense", resourceAndExpense);
-router.use("/boardEffectiveness", boardEffectiveness);
-router.use("/boardMemberReview", boardMemberReview);
-router.use("/inventory", inventory);
-router.use("/finance", finance);
-router.use("/strategicKPI", strategicKPI);
-router.use("/brainTrust", brainTrust);
-router.use("/idea", idea);
-router.use("/profile",auth, profile);
 router.use("/service", service);
+router.use("/inventory", inventory);
+router.use("/myusers", auth, myUsers);
 
 router.post("/upload", async(req, res, next) => {
     try{ 

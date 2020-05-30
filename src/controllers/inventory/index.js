@@ -6,7 +6,7 @@ inventory.getAll = async (req, res, next) => {
     try{
         const data = await getAll(req.body.gonextId);
         res.status(200).json({
-            status : true,
+            status : 1,
             message : "success",
             data
         });
@@ -19,7 +19,7 @@ inventory.getOne = async (req, res, next) => {
     try{
         const data = await getByID(req.params.itemId);        
         res.status(200).json({  
-            status : true,
+            status : 1,
             message : "success",
             data
         });
@@ -33,7 +33,7 @@ inventory.create = async (req, res, next) => {
         req.body.organizationID = req.body.gonextId;
         const data = await createOne(req.body);
         res.status(200).json({
-            status : true,
+            status : 1,
             message : "success",
             data
         });
@@ -49,7 +49,7 @@ inventory.createMany = async (req, res, next) => {
     try{
         const data = await createMany(req.body.inventory);
         res.status(200).json({
-            status : true,
+            status : 1,
             message : "success",
             data
         });
@@ -62,7 +62,7 @@ inventory.edit = async (req, res, next) => {
     try{
         const data = await edit(req.params.itemId, req.body);
         res.status(200).json({
-            status : true,
+            status : 1,
             message : "success",
             data
         });
@@ -75,7 +75,7 @@ inventory.deleteOne = async (req, res, next) => {
     try{
         const data = await deleteOne(req.params.itemId);
         res.status(200).json({
-            status : true,
+            status : 1,
             message : "success",
             data
         });
