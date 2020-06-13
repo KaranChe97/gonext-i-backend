@@ -2,7 +2,7 @@ const assert = require("assert");
 const { getAll, getByID, createOne,createMany, edit, deleteOne } = require("../../model/inventory");
 const inventory = {};
 
-inventory.getAll = async (req, res, next) => { 
+inventory.getAll = async (req, res, next) => {  
     try{
         const data = await getAll(req.body.gonextId);
         res.status(200).json({

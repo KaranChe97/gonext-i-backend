@@ -12,7 +12,7 @@ myUsersService.getByID = (id) => myUsers.findById({ _id : id });
 myUsersService.createOne = (data) => myUsers.create(data); 
 
 myUsersService.edit = (id,data) => myUsers.findByIdAndUpdate({ _id : id }, data );
-
+ 
 myUsersService.deleteOne = (id) => myUsers.findByIdAndDelete({ _id : id });
 
 module.exports = myUsersService;  

@@ -9,11 +9,13 @@ const admin = require("./admin");
 const service = require("./service");
 const inventory = require("./inventory");
 const myUsers = require("./myUsers");
+const transaction = require("./transaction");
 
 router.use("/admin", admin);
 router.use("/service", service);
 router.use("/inventory", inventory);
 router.use("/myusers", auth, myUsers);
+router.use("/transaction", auth, transaction);
 
 router.post("/upload", async(req, res, next) => {
     try{ 
