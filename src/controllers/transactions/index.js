@@ -57,6 +57,7 @@ transaction.getAll = async (req, res, next) => {
                 data
             });
         } else {
+            console.log("organizationID", organizationID);
             const data = await getAll(organizationID);
             res.status(200).json({
                 status : 1,
