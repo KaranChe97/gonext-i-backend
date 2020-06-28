@@ -4,12 +4,8 @@ const transactionService = {};
 
 transactionService.getAll = (id) => transaction.find({organizationID: id}); 
 
-transactionService.filterBy = (id, status, userIds) => transaction.find({
-    $and:[
-            {organizationID: id}, 
-            {transactionStatus: { $in: status}},
-            {userId : { $in: userIds}} 
-        ] 
+transactionService.filterBy = (filterArray) => transaction.find({
+        $and:filterArray
     });
 
 transactionService.getByID = (id) => transaction.findById({ _id : id });

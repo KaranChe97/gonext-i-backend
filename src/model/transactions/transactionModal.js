@@ -15,7 +15,11 @@ const transactionSchema = new mongoose.Schema({
         },
         transactionStatus: {
             type: String,
-            enum: ['new', 'cancelled', 'yetToDelivered', 'delivered', 'pending', 'partiallyPaid', 'paid']
+            enum: ['new', 'cancelled', 'yetToDelivered', 'delivered', 'partiallyPaid', 'paid']
+        },
+        transactionCode: {
+            type: Number,
+            enum: [1,2,3,4,5,6]
         },
         items: [{ 
             itemId: {type: mongoose.Schema.Types.ObjectId},
