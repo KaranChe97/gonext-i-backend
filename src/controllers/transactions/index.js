@@ -1,7 +1,7 @@
 const assert = require("assert");
 const { getAll, getByID, createOne, edit, deleteOne, filterBy } = require("../../model/transactions");
 const inventory = require("../../model/inventory"); 
-
+const myUsers = require("../../model/my_users");
 const transaction = {}; 
  
 transaction.create = async (req, res, next) => {
@@ -85,19 +85,30 @@ transaction.updateStatus = async (req,res,next) => {
         const { transactionId }  = req.params;  
         const { transactionCode,  amountPaid } = req.body; 
         const storedData = await getByID(transactionId);
-        let { items , totalAmount, pendingAmount, paidAmount } = storedData;
+        let { items , totalAmount, pendingAmount, paidAmount, userType, userId } = storedData;
         if(storedData.transactionCode === 3 &&  transactionCode === 4 ){
             const deliveredAt = new Date();
             for(let i= 0; i< items.length; i++ ){
                 let { itemId } = items[i];
                 const item = await inventory.getByID(itemId);
                 console.log("======item",item);
-                item.instock = item.instock - items[i].quantity; 
-                await inventory.edit(itemId, item);
-            }
+                if(item){
+                    item.instock = item.instock - items[i].quantity; 
+                    await inventory.edit(itemId, item);
+                }
+            }            
             req.body.transactionStatus = "delivered";
             req.body.deliveredAt = deliveredAt;
-            
+            if(userType === "myUser") {
+                const userDetail = await myUsers.getByID(userId);
+                console.log("My user ", userDetail);
+                if(userDetail) {
+                    userDetail.paymentPending = pendingAmount;
+                    await myUsers.edit(userId, userDetail);
+                    console.log("updated user");
+                }
+            }
+
         } else if((storedData.transactionCode === 4 || storedData.transactionCode === 5 ) && transactionCode === 6 ){
             console.log(paidAmount);
             const paidAt = new Date();
@@ -113,6 +124,15 @@ transaction.updateStatus = async (req,res,next) => {
             req.body.paidAmount = paidAmount;
             req.body.pendingAmount = pendingAmount;
             req.body.paidAt = paidAt;
+            if(userType === "myUser") {
+                const userDetail = await myUsers.getByID(userId);
+                console.log("My user ", userDetail);
+                if(userDetail) {
+                    userDetail.paymentPending = userDetail.paymentPending ? userDetail.paymentPending - amountPaid : pendingAmount;
+                    await myUsers.edit(userId, userDetail);
+                    console.log("updated user");
+                }
+            }
         }
         const data = await edit( transactionId, req.body);
         res.status(200).json({
