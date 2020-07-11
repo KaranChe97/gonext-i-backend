@@ -216,7 +216,7 @@ transaction.updateStatus = async (req,res,next) => {
                 const userDetail = await myUsers.getByID(userId);
                 console.log("My user ", userDetail);
                 if(userDetail) {
-                    userDetail.paymentPending = pendingAmount;
+                    userDetail.paymentPending = userDetail.paymentPending ? userDetail.paymentPending + pendingAmount : pendingAmount;
                     await myUsers.edit(userId, userDetail);
                     console.log("updated user");
                 }
