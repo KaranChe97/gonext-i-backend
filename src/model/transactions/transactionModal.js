@@ -24,7 +24,8 @@ const transactionSchema = new mongoose.Schema({
         items: [{ 
             itemId: {type: mongoose.Schema.Types.ObjectId},
             name: {type: String},
-            cost: {type: Number},
+            cost: {type: Number}, 
+            unit: {type: String},
             quantity: {type: Number}
         }],      
         totalAmount: { type: Number },
@@ -32,7 +33,7 @@ const transactionSchema = new mongoose.Schema({
         pendingAmount: {type: Number},        
         scheduledAt: { type: Date },
         expectedDelivery: { type: Date },
-        deliveredAt: { type: Date },
+        deliveredAt: { type: Date }, 
         paidAt: { type: Date },
         cancelledBy: { 
             type: String,

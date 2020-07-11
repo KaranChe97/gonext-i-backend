@@ -1,5 +1,6 @@
 const assert = require("assert");
-const { getAll, getByID, createOne, edit, deleteOne, filterBy } = require("../../model/transactions");
+const moment  = require('moment');
+const { getAll, getByID, createOne, edit, deleteOne, filterBy, filterByDelivery } = require("../../model/transactions");
 const inventory = require("../../model/inventory"); 
 const myUsers = require("../../model/my_users");
 const transaction = {}; 
@@ -7,9 +8,8 @@ const transaction = {};
 transaction.create = async (req, res, next) => {
     try{                            
         console.log(req.body);    
-        console.log(new Date("Sat Jun 13 2020 12:34:01 GMT+0530 (IST)"));
         const { totalAmount } = req.body; 
-        req.body.pendingAmount = totalAmount;
+        req.body.pendingAmount = totalAmount; 
         req.body.paidAmount = 0;
         req.body.transactionStatus = 'new';
         req.body.transactionCode = 1;
@@ -24,7 +24,7 @@ transaction.create = async (req, res, next) => {
             e.status = 200;
         }
         next(e);
-    }
+    } 
 };
 
 transaction.getOne = async (req, res, next) => {
@@ -47,25 +47,68 @@ transaction.getOne = async (req, res, next) => {
     }
 };
 
+function compare(a,b) {
+    if(a.pendingAmount > b.pendingAmount){
+        return -1
+    } 
+    return 1
+}
+
 transaction.getAll = async (req, res, next) => { 
     try{ 
         const { filters , organizationID } = req.body;
         if(filters) {
             const filterArray = [];
-            filterArray.push({organizationID})
+            if(filters.toDate && !filters.fromDate) {
+                return res.status(200).json({
+                    status: 2,
+                    message: 'From date is missing'
+                })
+            }
+            if(filters.fromDate && filters.toDate && (new Date(filters.fromDate) > new Date(filters.toDate))) {
+                return res.status(200).json({
+                    status: 2,
+                    message: 'From date should be lesser than To Date'
+                })
+            }
+
+            filterArray.push({organizationID});
+
             if(filters.userId && filters.userId.length){
                 filterArray.push({"userId" : { "$in": filters.userId}} )
             }
+
             if(filters.status && filters.status.length){
                 filterArray.push({"transactionCode": { "$in": filters.status}})
+            }         
+
+            if(filters.fromDate) {
+                filterArray.push(
+                    {"createdAt": {
+                        $gte: new Date(filters.fromDate)
+                    } }
+                )
+            }
+
+            if(filters.toDate) {
+                filterArray.push(
+                    {"createdAt": {
+                        $lte: new Date(filters.toDate)
+                    } }
+                )
             }
             console.log(filterArray);
-            const data = await filterBy(filterArray);
+
+            let data = await filterBy(filterArray);
+            if(filters.userId && filters.userId.length === 1) {
+                data = data.sort(compare)
+            }            
             res.status(200).json({
                 status : 1,
                 message : "success", 
-                data
+                data : data
             });
+
         } else {
             console.log("organizationID", organizationID);
             const data = await getAll(organizationID);
@@ -80,13 +123,83 @@ transaction.getAll = async (req, res, next) => {
     }
 }; 
 
+
+transaction.getAllScheduled = async (req, res, next) => { 
+    try{ 
+        const { filters , organizationID } = req.body;
+
+        const filterArray = [];
+        filterArray.push({organizationID});
+        filterArray.push({"transactionCode": { "$in": [3]}});
+      
+        if(filters) {
+            if(filters.toDate && !filters.fromDate) {
+                return res.status(200).json({
+                    status: 2,
+                    message: 'From date is missing'
+                })
+            }
+            if(filters.fromDate && filters.toDate && (new Date(filters.fromDate) > new Date(filters.toDate))) {
+                return res.status(200).json({
+                    status: 2,
+                    message: 'From date should be lesser than To Date'
+                })
+            }                       
+
+            if(filters.fromDate) {
+                filterArray.push(
+                    {"scheduledAt": {
+                        $gte: filters.fromDate
+                    } }
+                )
+            }
+
+            if(filters.toDate) {
+                filterArray.push(
+                    {"scheduledAt": {
+                        $lte: moment(filters.toDate).add(1, 'days').format('YYYY-MM-DD')
+                    } }
+                )
+            }                  
+        } else {
+            filterArray.push(
+                {"scheduledAt": {
+                    $gte: moment().format('YYYY-MM-DD')
+                } }
+            )
+        }
+        console.log(filterArray);
+        const data = await filterByDelivery(filterArray);
+        res.status(200).json({
+            status : 1,
+            message : "success", 
+            data
+        });        
+    } catch(e){
+        next(e);
+    }
+}; 
+
+
 transaction.updateStatus = async (req,res,next) => {
     try{                    
         const { transactionId }  = req.params;  
         const { transactionCode,  amountPaid } = req.body; 
         const storedData = await getByID(transactionId);
         let { items , totalAmount, pendingAmount, paidAmount, userType, userId } = storedData;
-        if(storedData.transactionCode === 3 &&  transactionCode === 4 ){
+
+        if( (storedData.transactionCode !== 4 || storedData.transactionCode !== 5 ) && transactionCode === 6  ){
+            return res.status(200).json({
+                status: 2,
+                message: "Illegal operation. To pay amout transaction should be delivered"
+            })
+        } else if(storedData.transactionCode !== 3 &&  transactionCode === 4) {
+            return res.status(200).json({
+                status: 2,
+                message: "Illegal operation. cannot deliver non-approved transaction"
+            })
+        }
+         else if(storedData.transactionCode === 3 &&  transactionCode === 4 ){
             const deliveredAt = new Date();
             for(let i= 0; i< items.length; i++ ){
                 let { itemId } = items[i];
@@ -98,7 +211,7 @@ transaction.updateStatus = async (req,res,next) => {
                 }
             }            
             req.body.transactionStatus = "delivered";
-            req.body.deliveredAt = deliveredAt;
+            req.body.deliveredAt = deliveredAt; 
             if(userType === "myUser") {
                 const userDetail = await myUsers.getByID(userId);
                 console.log("My user ", userDetail);
@@ -108,12 +221,23 @@ transaction.updateStatus = async (req,res,next) => {
                     console.log("updated user");
                 }
             }
-
         } else if((storedData.transactionCode === 4 || storedData.transactionCode === 5 ) && transactionCode === 6 ){
             console.log(paidAmount);
+            if(!amountPaid) {
+                return res.status(200).json({
+                    status: 2,
+                    message: 'Paid amount is missing'
+                })
+            }
             const paidAt = new Date();
             paidAmount += amountPaid;
             pendingAmount = totalAmount - paidAmount;
+            if(pendingAmount < 0) {
+                return res.status(200).json({
+                    status: 2,
+                    message: "Paid Amount is greater than pending amount"
+                })
+            }
             if(!pendingAmount){
                 req.body.transactionCode = 6;
                 req.body.transactionStatus = 'paid'
@@ -133,7 +257,7 @@ transaction.updateStatus = async (req,res,next) => {
                     console.log("updated user");
                 }
             }
-        }
+        } 
         const data = await edit( transactionId, req.body);
         res.status(200).json({
             status : 1,

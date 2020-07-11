@@ -6,8 +6,12 @@ transactionService.getAll = (id) => transaction.find({organizationID: id});
 
 transactionService.filterBy = (filterArray) => transaction.find({
         $and:filterArray
-    });
+    }).sort({ _id: -1});
 
+transactionService.filterByDelivery = (filterArray) => transaction.find({
+    $and:filterArray
+}).sort({scheduledAt: -1});
+ 
 transactionService.getByID = (id) => transaction.findById({ _id : id });
 
 transactionService.createOne = (data) => transaction.create(data); 
