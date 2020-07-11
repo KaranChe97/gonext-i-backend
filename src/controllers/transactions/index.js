@@ -85,7 +85,7 @@ transaction.getAll = async (req, res, next) => {
             if(filters.fromDate) {
                 filterArray.push(
                     {"createdAt": {
-                        $gte: new Date(filters.fromDate)
+                        $gte: filters.fromDate
                     } }
                 )
             }
@@ -93,7 +93,7 @@ transaction.getAll = async (req, res, next) => {
             if(filters.toDate) {
                 filterArray.push(
                     {"createdAt": {
-                        $lte: new Date(filters.toDate)
+                        $lte: moment(filters.toDate).add(1, 'days').format('YYYY-MM-DD')
                     } }
                 )
             }
@@ -188,7 +188,7 @@ transaction.updateStatus = async (req,res,next) => {
         const storedData = await getByID(transactionId);
         let { items , totalAmount, pendingAmount, paidAmount, userType, userId } = storedData;
 
-        if( (storedData.transactionCode !== 4 || storedData.transactionCode !== 5 ) && transactionCode === 6  ){
+        if( (storedData.transactionCode !== 4 && storedData.transactionCode !== 5 ) && transactionCode === 6  ){
             return res.status(200).json({
                 status: 2,
                 message: "Illegal operation. To pay amout transaction should be delivered"
