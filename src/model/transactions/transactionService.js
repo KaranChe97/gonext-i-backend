@@ -4,9 +4,9 @@ const transactionService = {};
 
 transactionService.getAll = (id) => transaction.find({organizationID: id}); 
 
-transactionService.filterBy = (filterArray) => transaction.find({
+transactionService.filterBy = (filterArray, order) => transaction.find({
         $and:filterArray
-    }).sort({ _id: -1});
+    }).sort({ _id: order});
 
 transactionService.filterByDelivery = (filterArray) => transaction.find({
     $and:filterArray

@@ -8,8 +8,7 @@ const transaction = {};
 transaction.create = async (req, res, next) => {
     try{                            
         console.log(req.body);    
-        const { totalAmount } = req.body; 
-        req.body.pendingAmount = totalAmount; 
+        req.body.pendingAmount = 0; 
         req.body.paidAmount = 0;
         req.body.transactionStatus = 'new';
         req.body.transactionCode = 1;
@@ -99,7 +98,7 @@ transaction.getAll = async (req, res, next) => {
             }
             console.log(filterArray);
 
-            let data = await filterBy(filterArray);
+            let data = await filterBy(filterArray, -1 );
             if(filters.userId && filters.userId.length === 1) {
                 data = data.sort(compare)
             }            
@@ -108,7 +107,7 @@ transaction.getAll = async (req, res, next) => {
                 message : "success", 
                 data : data
             });
-
+ 
         } else {
             console.log("organizationID", organizationID);
             const data = await getAll(organizationID);
@@ -211,12 +210,13 @@ transaction.updateStatus = async (req,res,next) => {
                 }
             }            
             req.body.transactionStatus = "delivered";
+            req.body.pendingAmount = totalAmount; 
             req.body.deliveredAt = deliveredAt; 
             if(userType === "myUser") {
                 const userDetail = await myUsers.getByID(userId);
                 console.log("My user ", userDetail);
                 if(userDetail) {
-                    userDetail.paymentPending = userDetail.paymentPending ? userDetail.paymentPending + pendingAmount : pendingAmount;
+                    userDetail.paymentPending = userDetail.paymentPending ? userDetail.paymentPending + totalAmount : totalAmount;
                     await myUsers.edit(userId, userDetail);
                     console.log("updated user");
                 }
@@ -326,6 +326,76 @@ transaction.deleteOne = async (req, res, next) => {
         next(e);
     }
 };
+
+
+transaction.setUpAll = async (req, res, next) => {
+    try {
+        console.log(req.body);
+        const { userId, userType, gonextId } = req.body;
+        let { amount } = req.body;        
+
+        if(!userId) {
+            res.status(200).json({
+                status: 2,
+                message: 'UserId is missing'
+            })
+        }
+        if(!amount) {
+            res.status(200).json({
+                status: 2,
+                message: 'Amount is missing'
+            })
+        }
+        const filterArray = [];
+        filterArray.push({organizationID: gonextId });
+        filterArray.push({"userId" : { "$in": userId}} );
+        filterArray.push({"transactionCode": { "$in": [4,5] }})
+        const pendTrans = await filterBy(filterArray, 1);
+        // console.log(pendTrans);
+        const paidAt = new Date();
+        for(const i in pendTrans){
+            if(amount) {
+                if(amount >= pendTrans[i].pendingAmount){
+                    const paidAmount = pendTrans[i].pendingAmount;
+                    amount -= paidAmount;
+                    console.log("greater============",paidAmount, amount);
+                    pendTrans[i].paidAmount += paidAmount;
+                    pendTrans[i].pendingAmount = pendTrans[i].totalAmount - pendTrans[i].paidAmount;
+                    pendTrans[i].transactionCode = 6;
+                    pendTrans[i].transactionStatus = 'paid';
+                    pendTrans[i].paidAt = paidAt;
+                } else {
+                    const pending = pendTrans[i].pendingAmount - amount;                    
+                    console.log("lesser", pending, amount);
+                    pendTrans[i].paidAmount += amount;
+                    pendTrans[i].pendingAmount = pendTrans[i].totalAmount - pendTrans[i].paidAmount;
+                    pendTrans[i].transactionCode = 5;
+                    pendTrans[i].transactionStatus = 'partiallyPaid';
+                    pendTrans[i].paidAt = paidAt;
+                    amount = 0;
+                }
+                await edit( pendTrans[i]._id, pendTrans[i]);
+                console.log(pendTrans[i]);              
+            }
+        }
+
+        if(userType === "myUser") {
+            const userDetail = await myUsers.getByID(userId);
+            if(userDetail) {
+                userDetail.paymentPending = userDetail.paymentPending ? userDetail.paymentPending -  req.body.amount :  pendTrans[i].pendingAmount;
+                await myUsers.edit(userId, userDetail);
+                console.log("updated user", req.body.amount, userDetail);
+            }
+        }
+
+        res.status(200).json({
+            status : 1,
+            message : "success",            
+        });
+    } catch(e){
+        next(e);
+    }
+}
 
  
 module.exports = transaction;
