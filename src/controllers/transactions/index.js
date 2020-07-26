@@ -123,6 +123,42 @@ transaction.getAll = async (req, res, next) => {
 }; 
 
 
+
+transaction.getMonthly = async (req, res, next) => { 
+    try{ 
+        const { year, month, organizationID } = req.body;
+        var startDate = moment([year, month - 1]);
+        var endDate = moment(startDate).endOf('month');
+        const filterArray = [];        
+        filterArray.push({organizationID});
+        filterArray.push({"transactionCode": { "$in": [5,6]}});
+        filterArray.push(
+            {"createdAt": {
+                $gte: startDate
+            } }
+        )
+        filterArray.push(
+            {"createdAt": {
+                $lte: endDate
+            } }
+        )        
+        console.log(filterArray);
+
+        let data = await filterBy(filterArray, -1 );
+        let totalRevenue = data.reduce((amount, a) => amount + a.paidAmount, 0);
+
+        res.status(200).json({
+            status : 1,
+            message : "success", 
+            totalRevenue,
+            transactions : data
+        });
+        
+    } catch(e){
+        next(e);
+    }
+}; 
+
 transaction.getAllScheduled = async (req, res, next) => { 
     try{ 
         const { filters , organizationID } = req.body;

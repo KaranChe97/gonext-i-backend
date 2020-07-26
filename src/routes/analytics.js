@@ -1,8 +1,9 @@
 const router = require("express").Router();
-const {homeDashboard} = require("../controllers/analytics");
+const { homeDashboard, pendingAmount, revenue } = require("../controllers/analytics");
 
 router.get('/home', homeDashboard);
-// router.post('/all', getAll); 
+router.get('/pending', pendingAmount);
+router.get('/revenue', revenue); 
 // router.post('/delivery', getAllScheduled);
 // router.get('/:transactionId', getOne);
 // router.patch('/:transactionId', updateStatus);
