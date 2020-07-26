@@ -10,12 +10,14 @@ const service = require("./service");
 const inventory = require("./inventory");
 const myUsers = require("./myUsers");
 const transaction = require("./transaction");
+const analytics = require("./analytics");
 
 router.use("/admin", admin);
 router.use("/service", service);
 router.use("/inventory", inventory);
 router.use("/myusers", auth, myUsers);
 router.use("/transaction", auth, transaction);
+router.use("/analytics", auth, analytics);
 
 router.post("/upload", async(req, res, next) => {
     try{ 
