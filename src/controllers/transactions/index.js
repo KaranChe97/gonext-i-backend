@@ -369,7 +369,7 @@ transaction.setUpAll = async (req, res, next) => {
         console.log(req.body);
         const { userId, userType, gonextId } = req.body;
         let { amount } = req.body;        
-
+        amount = Number(amount);
         if(!userId) {
             res.status(200).json({
                 status: 2,
