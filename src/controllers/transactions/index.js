@@ -1,6 +1,8 @@
 const assert = require("assert");
 const moment  = require('moment');
 const { getAll, getByID, createOne, edit, deleteOne, filterBy, filterByDelivery } = require("../../model/transactions");
+const { getAll:inventoryAll } = require("../../model/inventory");
+
 const inventory = require("../../model/inventory"); 
 const myUsers = require("../../model/my_users");
 const transaction = {}; 
@@ -158,6 +160,87 @@ transaction.getMonthly = async (req, res, next) => {
         next(e);
     }
 }; 
+
+
+transaction.getOutForDelivery =  async (req, res, next) => {
+    try {
+        const { gonextId }  = req.body;
+        console.log(req.body);
+        const todayArray = []; 
+        const tomorrowArray = [];
+        let todayStock = [];
+        let upcomingStock = [];
+        todayArray.push({organizationID: gonextId});       
+        todayArray.push({"transactionCode": { "$in": [3]}});
+        todayArray.push(
+            {"scheduledAt": {
+                $lte: moment().endOf('day').format()
+            } }
+        ); 
+        tomorrowArray.push({organizationID: gonextId});
+        tomorrowArray.push({"transactionCode": { "$in": [3]}});
+        tomorrowArray.push(
+            {"scheduledAt": {
+                $gte: moment().startOf('day').format()
+            } }
+        );
+        
+        const todayDelivery = await filterByDelivery(todayArray);
+        const upcomingDelivery = await filterByDelivery(tomorrowArray);
+        const inventoryData = await inventoryAll(gonextId);
+            inventoryData.forEach((e) => {
+                todayStock.push({ itemId: e._id, name: e.name , needed: 0 })
+                upcomingStock.push({ itemId: e._id, name: e.name , needed: 0 })
+            }
+        ); 
+        for(const i in todayDelivery) {
+            const { items } = todayDelivery[i];
+            for(const j in items){
+                let sIdx = todayStock.findIndex(e => e.itemId.equals(items[j].itemId));
+                if(sIdx > -1){
+                    todayStock[sIdx].needed += items[j].quantity
+                } else {
+                    todayStock.push({
+                        itemId: items[j].itemId,
+                        name: items[j].name,
+                        needed: items[j].quantity
+                    })
+                }
+            }
+        }
+        for(const i in upcomingDelivery) {
+            const { items } = upcomingDelivery[i];
+            for(const j in items){
+                let sIdx = upcomingStock.findIndex(e => e.itemId .equals(items[j].itemId));
+                if(sIdx > -1){
+                    upcomingStock[sIdx].needed += items[j].quantity
+                } else {
+                    upcomingStock.push({
+                        itemId: items[j].itemId,
+                        name: items[j].name,
+                        needed: items[j].quantity
+                    })
+                }
+            }
+        }
+        res.json({
+            status: 1,
+            message: "success",
+            todayDelivery,
+            todayStock,
+            upcomingDelivery,
+            upcomingStock,
+            inventoryData
+        });
+
+       } catch(e){ 
+        console.log(e); 
+        if(e.code === 'ERR_ASSERTION') {
+            e.status = 200; 
+        }
+        next(e);
+    }
+}
 
 transaction.getAllScheduled = async (req, res, next) => { 
     try{ 

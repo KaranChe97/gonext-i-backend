@@ -9,8 +9,8 @@ transactionService.filterBy = (filterArray, order) => transaction.find({
     }).sort({ _id: order});
 
 transactionService.filterByDelivery = (filterArray) => transaction.find({
-    $and:filterArray
-}).sort({scheduledAt: -1});
+        $and:filterArray
+    }).sort({scheduledAt: -1});
  
 transactionService.getByID = (id) => transaction.findById({ _id : id });
 
