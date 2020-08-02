@@ -1,5 +1,6 @@
 const assert = require("assert");
 const { getAll, getByID, createOne, edit, deleteOne, getOne } = require("../../model/my_users");
+const { edit: editTransactions, filterBy:allTransactions, } = require("../../model/transactions");
 const model = require("../../model/my_users/myUsersModel");
 const myUsers = {};
 
@@ -103,13 +104,53 @@ myUsers.edit = async (req, res, next) => {
     }
 };
 
-myUsers.deleteOne = async (req, res, next) => {
-    try{
-        const data = await deleteOne(req.params.userId);
+myUsers.deleteCheck = async(req, res, next) => {
+    try {
+        const { gonextId } = req.body;
+        const { userId } = req.params;
+        const filterArray = [];
+        filterArray.push({organizationID: gonextId }, {"userId" : { "$in": userId}},{"transactionCode": { "$in": [1,3,4,5]}} );
+        const data = await allTransactions(filterArray, -1);
         res.status(200).json({
             status : 1,
             message : "success",
-            data
+            transactionsPending: data.length,
+        });
+    } catch(e){
+        next(e);
+    } 
+}
+
+myUsers.deleteOne = async (req, res, next) => {
+    try{
+        const { gonextId } = req.body;
+        const { userId } = req.params;
+        const newFilter = [];
+        const oldFilter = [];
+        newFilter.push({organizationID: gonextId }, {"userId" : { "$in": userId}},{"transactionCode": { "$in": [1,3]}} );
+        oldFilter.push({organizationID: gonextId }, {"userId" : { "$in": userId}},{"transactionCode": { "$in": [4,5]}} );
+   
+        const newOrders =  await allTransactions(newFilter, -1 );
+        const deliveredOrders = await allTransactions(oldFilter, -1);
+
+        for (const i in newOrders){           
+            const transactionId = newOrders[i]._id;
+            await editTransactions ( transactionId, { transactionStatus: 'cancelled', transactionCode: 2, cancelledBy: 'admin' });
+        }
+
+        for (const j in deliveredOrders){
+            const transactionId = deliveredOrders[j]._id;
+            const paidAmount = deliveredOrders[j].totalAmount;
+            const pendingAmount = 0;
+            await editTransactions (transactionId, {transactionStatus: 'paid', transactionCode: 6, paidAmount, pendingAmount  })
+        }
+        const data = await deleteOne(userId);
+        res.status(200).json({
+            status : 1,
+            message : "success",
+            data,
+            transactionsCancelled: newOrders.length,
+            transactionsPaid: deliveredOrders.length           
         });
     } catch(e){
         next(e);

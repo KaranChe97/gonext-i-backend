@@ -30,7 +30,7 @@ inventory.getAll = async (req, res, next) => {
                     })
                 }
             }
-        }
+        } 
         res.status(200).json({
             status : 1,
             message : "success",
