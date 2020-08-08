@@ -181,7 +181,7 @@ transaction.getOutForDelivery =  async (req, res, next) => {
         tomorrowArray.push({"transactionCode": { "$in": [3]}});
         tomorrowArray.push(
             {"scheduledAt": {
-                $gte: moment().startOf('day').format()
+                $gte: moment().endOf('day').format()
             } }
         );
         
@@ -341,7 +341,7 @@ transaction.updateStatus = async (req,res,next) => {
                 }
             }
         } else if((storedData.transactionCode === 4 || storedData.transactionCode === 5 ) && transactionCode === 6 ){
-            console.log(paidAmount);
+            console.log(paidAmount, req.params);
             if(!amountPaid) {
                 return res.status(200).json({
                     status: 2,

@@ -22,18 +22,24 @@ service.sendOtp = async (req, res, next) => {
         const data = await getOne(req.body.phonenumber);
         if(req.body.type === 'forget') {
             if(data) {
-                client.messages.create(params, (err, message) => {
-                    if(err) {
-                        console.log(err);
-                        res.status(200).send(err);
-                    } else {
-                        res.status(200).send({ 
-                            status: 1,
-                            type: req.body.type,
-                            otpToken: otpToken
-                    }) 
-                    }
-                })       
+                res.status(200).send({ 
+                    status: 1,
+                    type: req.body.type,
+                    otpToken,
+                    verificationCode
+              }) 
+                // client.messages.create(params, (err, message) => {
+                //     if(err) {
+                //         console.log(err);
+                //         res.status(200).send(err);
+                //     } else {
+                //         res.status(200).send({ 
+                //             status: 1,
+                //             type: req.body.type,
+                //             otpToken: otpToken,
+                //     }) 
+                //     }
+                // })       
             } else {
                 res.status(200).send({
                     status : 2,
@@ -47,18 +53,24 @@ service.sendOtp = async (req, res, next) => {
                     message: 'Account already exist'
                 })
             } else {
-          client.messages.create(params, (err, message) => {
-              if(err) {
-                  console.log(err);
-                  res.status(200).send(err);
-              } else {
-                  res.status(200).send({ 
-                      status: 1,
-                      type: req.body.type,
-                      otpToken: otpToken
-                }) 
-              }
-          })       
+                res.status(200).send({ 
+                    status: 1,
+                    type: req.body.type,
+                    otpToken,
+                    verificationCode
+              }) 
+        //   client.messages.create(params, (err, message) => {
+        //       if(err) {
+        //           console.log(err);
+        //           res.status(200).send(err);
+        //       } else {
+        //           res.status(200).send({ 
+        //               status: 1,
+        //               type: req.body.type,
+        //               otpToken: otpToken
+        //         }) 
+        //       }
+        //   })       
         }
         } else {
             res.status(200).send({
