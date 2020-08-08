@@ -302,7 +302,9 @@ transaction.getAllScheduled = async (req, res, next) => {
 transaction.updateStatus = async (req,res,next) => {
     try{                    
         const { transactionId }  = req.params;  
-        const { transactionCode,  amountPaid } = req.body; 
+        const { transactionCode } = req.body; 
+        let { amountPaid } = req.body;        
+        amountPaid = Number(amountPaid);
         const storedData = await getByID(transactionId);
         let { items , totalAmount, pendingAmount, paidAmount, userType, userId } = storedData;
 
@@ -341,7 +343,7 @@ transaction.updateStatus = async (req,res,next) => {
                 }
             }
         } else if((storedData.transactionCode === 4 || storedData.transactionCode === 5 ) && transactionCode === 6 ){
-            console.log(paidAmount, req.params);
+            console.log(paidAmount, amountPaid, req.params);
             if(!amountPaid) {
                 return res.status(200).json({
                     status: 2,
