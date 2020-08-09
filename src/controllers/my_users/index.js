@@ -2,6 +2,7 @@ const assert = require("assert");
 const { getAll, getByID, createOne, edit, deleteOne, getOne } = require("../../model/my_users");
 const { edit: editTransactions, filterBy:allTransactions, } = require("../../model/transactions");
 const model = require("../../model/my_users/myUsersModel");
+const inventoryModel = require("../../model/inventory");
 const myUsers = {};
 
 myUsers.getAll = async (req, res, next) => { 
@@ -16,6 +17,21 @@ myUsers.getAll = async (req, res, next) => {
         next(e);
     }
 }; 
+
+myUsers.createPurchaseInit = async(req, res, next) => {
+    try{
+        const users = await getAll(req.body.gonextId);
+        const inventoryData = await inventoryModel.getAll(req.body.gonextId);
+        res.status(200).json({
+            status : 1,
+            message : "success", 
+            users,
+            inventoryData
+        });
+    } catch(e){
+        next(e);
+    }
+}
 
 myUsers.getOne = async (req, res, next) => {
     try{

@@ -1,9 +1,10 @@
 const router = require("express").Router();
 const auth = require("../middleware/auth");
-const { getAll, getAllScheduled, getOne, create , updateStatus , accept, cancel, deleteOne, setUpAll, getMonthly, getOutForDelivery } = require("../controllers/transactions");
+const { getAll, getAllScheduled, getOne, create, getByUser, updateStatus , accept, cancel, deleteOne, setUpAll, getMonthly, getOutForDelivery } = require("../controllers/transactions");
 
 router.post('/create', create);
 router.post('/all', getAll); 
+router.post('/getByUser', getByUser);
 router.get('/deliverydata', getOutForDelivery);
 router.post('/delivery', getAllScheduled);
 router.get('/:transactionId', getOne);

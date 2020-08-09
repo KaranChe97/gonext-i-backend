@@ -6,6 +6,7 @@ const { findAndIncrement, createPurchaseId, isCollectionExist } = require("../..
 
 const inventory = require("../../model/inventory"); 
 const myUsers = require("../../model/my_users");
+const transactions = require("../../model/transactions");
 const transaction = {}; 
  
 transaction.create = async (req, res, next) => {
@@ -94,8 +95,8 @@ transaction.getAll = async (req, res, next) => {
             if(filters.status && filters.status.length){
                 filterArray.push({"transactionCode": { "$in": filters.status}})
             }         
-
             if(filters.fromDate) {
+
                 filterArray.push(
                     {"createdAt": {
                         $gte: filters.fromDate
@@ -530,6 +531,30 @@ transaction.setUpAll = async (req, res, next) => {
     }
 }
 
+transaction.getByUser = async(req,res,next) => {
+    try {
+        const { userId, userType, organizationID } = req.body;
+        let userDetails= '';
+        if(userType === "myUser") {
+            userDetails = await myUsers.getByID(userId);
+        }
+
+        const filterArray = [];
+        filterArray.push({organizationID});
+        filterArray.push({"userId" : { "$in": [userId] }} );
+
+        const transactions = await filterBy(filterArray, -1);
+
+        res.status(200).json({
+            status:1,
+            message: 'success',
+            userDetails,
+            transactions
+        })
+    } catch(e){
+        next(e);
+    }
+}
 
  
 module.exports = transaction;
