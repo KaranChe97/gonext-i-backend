@@ -1,5 +1,6 @@
 const assert = require("assert");
-const { getAll, getOne, getByID, createOne, edit, deleteOne, } = require("../../model/admin");
+const { getAll, getOne, getByID, createOne, edit, deleteOne, checkCompanyId } = require("../../model/admin");
+const { createPurchaseId } = require("../../model/purchaseId");
 const { generateToken } = require("../../common/token");
 const { compareData, generateHash } = require("../../common/hash");
 
@@ -71,7 +72,7 @@ admin.getOne = async (req, res, next) => {
     } 
 };
 
-admin.create = async (req, res, next) => {
+admin.create = async (req, res, next) => { 
     try{ 
         console.log('create api', req.body)
         assert(req.body.phonenumber, "phonenumber is required");
@@ -79,13 +80,22 @@ admin.create = async (req, res, next) => {
         assert(req.body.role, "role is required");
         assert(req.body.name, "Name is required");
         assert(req.body.address, "Address is required");
+        assert(req.body.companyId, "companyId is required");
         const isExist = await getOne(req.body.phonenumber);
+        const isCompanyIdExist = await checkCompanyId(req.body.companyId);
+        console.log("company exist", isCompanyIdExist, "phone exist", isExist)
         if(isExist) {
             res.status(200).json({
                 status: 0,
                 message: 'Phone number already exist.'
             })
+        } else if( isCompanyIdExist ) {
+            res.status(200).json({
+                status: 0,
+                message: 'Company Id already exist. Please try another.'
+            })
         } else {
+            await createPurchaseId({ _id: req.body.companyId, sequence: 0 });
             const data = await createOne(req.body);
             const token = await generateToken(data._doc);
 

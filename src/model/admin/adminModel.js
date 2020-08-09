@@ -5,6 +5,9 @@ const adminSchema = new mongoose.Schema({
     name : {
         type : String
     },
+    companyId: {
+        type: String
+    },
     phonenumber : {
         type : String
     },

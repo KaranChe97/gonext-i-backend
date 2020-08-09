@@ -2,18 +2,29 @@ const assert = require("assert");
 const moment  = require('moment');
 const { getAll, getByID, createOne, edit, deleteOne, filterBy, filterByDelivery } = require("../../model/transactions");
 const { getAll:inventoryAll } = require("../../model/inventory");
+const { findAndIncrement, createPurchaseId, isCollectionExist } = require("../../model/purchaseId");
 
 const inventory = require("../../model/inventory"); 
 const myUsers = require("../../model/my_users");
 const transaction = {}; 
  
 transaction.create = async (req, res, next) => {
-    try{                            
+    try{                           
+        assert(req.body.companyId, "companyId is required"); 
         console.log(req.body);    
         req.body.pendingAmount = 0; 
         req.body.paidAmount = 0;
         req.body.transactionStatus = 'new';
         req.body.transactionCode = 1;
+        let isPurchaseIdExists = await isCollectionExist(req.body.companyId);
+        let purchaseNumber = "";
+        if(!isPurchaseIdExists) {
+            purchaseNumber = await createPurchaseId({ _id: req.body.companyId, sequence: 1, });
+        } else {
+            purchaseNumber = await findAndIncrement(req.body.companyId);
+        }
+       
+        req.body.purchaseId = `${req.body.companyId}-${purchaseNumber.sequence}`;
         const data = await createOne(req.body);
         res.status(200).json({
             status : 1,
@@ -376,7 +387,7 @@ transaction.updateStatus = async (req,res,next) => {
                     userDetail.paymentPending = userDetail.paymentPending ? userDetail.paymentPending - amountPaid : pendingAmount;
                     await myUsers.edit(userId, userDetail);
                     console.log("updated user");
-                }
+                }  
             }
         } 
         const data = await edit( transactionId, req.body);

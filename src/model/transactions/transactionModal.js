@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const transactionSchema = new mongoose.Schema({   
         organizationID: {type: mongoose.Schema.Types.ObjectId},
         userId : {type:  mongoose.Schema.Types.ObjectId},
+        purchaseId: {type: String},
         userName: {type: String},      
         userType: {
             type: String, 
