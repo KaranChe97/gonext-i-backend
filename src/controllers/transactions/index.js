@@ -16,6 +16,7 @@ transaction.create = async (req, res, next) => {
         req.body.paidAmount = 0;
         req.body.transactionStatus = 'new';
         req.body.transactionCode = 1;
+        req.body.totalAmount = Number(req.body.totalAmount);
         let isPurchaseIdExists = await isCollectionExist(req.body.companyId);
         let purchaseNumber = "";
         if(!isPurchaseIdExists) {
@@ -222,7 +223,7 @@ transaction.getOutForDelivery =  async (req, res, next) => {
         for(const i in upcomingDelivery) {
             const { items } = upcomingDelivery[i];
             for(const j in items){
-                let sIdx = upcomingStock.findIndex(e => e.itemId .equals(items[j].itemId));
+                let sIdx = upcomingStock.findIndex(e => e.itemId.equals(items[j].itemId));
                 if(sIdx > -1){
                     upcomingStock[sIdx].needed += items[j].quantity
                 } else {

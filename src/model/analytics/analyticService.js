@@ -13,9 +13,9 @@ analyticService.pendingAll = (filterArray) => transaction.aggregate([
     },
     {
         $group:  {
-            _id:{ userId: "$userId", userName: "$userName" },
+            _id:{ userId: "$userId", type: "$userType" },
             pendingAmount : { $sum: "$pendingAmount" },
-         }        
+         }          
     }  
 ])
 

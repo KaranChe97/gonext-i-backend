@@ -37,6 +37,7 @@ myUsers.getOne = async (req, res, next) => {
     }
 };
 
+
 myUsers.create = async (req, res, next) => {
     try{
         req.body.organizationID = req.body.gonextId;

@@ -1,6 +1,8 @@
 const assert = require("assert");
 const moment  = require('moment');
 const { filterBy , pendingAll, revenue } = require("../../model/analytics");
+const { getUsers } = require("../../model/my_users");
+
 const inventory = require("../../model/inventory"); 
 
 const analytics = {};
@@ -64,6 +66,15 @@ analytics.pendingAmount =  async (req, res, next) => {
         filter2.push({"transactionCode": { "$in": [4,5]}}); 
         
         const pendingTransactions = await pendingAll(filter2);
+        const myUsers = pendingTransactions.filter((d) => d._id.type === "myUser");
+        const myUserIds = myUsers.map((d) => d._id.userId);
+        const myUserDetails = await getUsers(myUserIds);
+        for(let i=0; i< myUsers.length; i++){
+            const detail = myUserDetails.find((d) => d._id.equals(myUsers[i]._id.userId) );
+            if(detail){
+                myUsers[i].userDetails = detail;
+            }
+        }
         
         let pendingAmount = pendingTransactions.reduce((pending, a) => pending + a.pendingAmount, 0);
         res.status(200).json({
@@ -88,7 +99,7 @@ analytics.revenue =  async (req, res, next) => {
         const { gonextId } = req.body;       
 
         const filter2 = [];
-        filter2.push({organizationID: gonextId});
+        filter2.push({organizationID: gonextId}); 
         filter2.push({"transactionCode": { "$in": [5,6]}}); 
         
         const paidTransactions = await revenue(filter2);

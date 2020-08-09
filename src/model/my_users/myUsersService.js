@@ -13,6 +13,9 @@ myUsersService.createOne = (data) => myUsers.create(data);
 
 myUsersService.edit = (id,data) => myUsers.findByIdAndUpdate({ _id : id }, data );
  
-myUsersService.deleteOne = (id) => myUsers.findByIdAndDelete({ _id : id });
+myUsersService.deleteOne = (id) => myUsers.findByIdAndDelete({ _id : id }); 
+
+
+myUsersService.getUsers = (userIds) => myUsers.find({ _id:  { "$in": userIds }  });
 
 module.exports = myUsersService;  

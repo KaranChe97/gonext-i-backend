@@ -1,6 +1,7 @@
 const assert = require("assert");
 const { getAll, getOne, getByID, createOne, edit, deleteOne, checkCompanyId } = require("../../model/admin");
 const { createPurchaseId } = require("../../model/purchaseId");
+const { createCompanyId, findAndIncrement, isCollectionExist } = require("../../model/companyId");
 const { generateToken } = require("../../common/token");
 const { compareData, generateHash } = require("../../common/hash");
 
@@ -80,21 +81,26 @@ admin.create = async (req, res, next) => {
         assert(req.body.role, "role is required");
         assert(req.body.name, "Name is required");
         assert(req.body.address, "Address is required");
-        assert(req.body.companyId, "companyId is required");
         const isExist = await getOne(req.body.phonenumber);
-        const isCompanyIdExist = await checkCompanyId(req.body.companyId);
-        console.log("company exist", isCompanyIdExist, "phone exist", isExist)
+        console.log("phone exist", isExist)
         if(isExist) {
             res.status(200).json({
                 status: 0,
                 message: 'Phone number already exist.'
-            })
-        } else if( isCompanyIdExist ) {
-            res.status(200).json({
-                status: 0,
-                message: 'Company Id already exist. Please try another.'
-            })
+            }) 
         } else {
+
+            let isCompanyIdExists = await isCollectionExist("dc");
+
+            let companyInit = "";
+
+            if(!isCompanyIdExists) {
+                companyInit = await createCompanyId();
+            } else {
+                companyInit = await findAndIncrement("dc");
+            }
+
+            req.body.companyId =  `${companyInit._id}${companyInit.sequence}`;
             await createPurchaseId({ _id: req.body.companyId, sequence: 0 });
             const data = await createOne(req.body);
             const token = await generateToken(data._doc);
