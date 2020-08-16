@@ -1,8 +1,9 @@
 const companyIdModel = require('./companyIdModel');
+const { COMPANYIDFORMAT } = require('../../common/constants');
 
 const companyIdService = {};
 
-companyIdService.createCompanyId = () =>  companyIdModel.create({ _id: 'dc', sequence:1});
+companyIdService.createCompanyId = () =>  companyIdModel.create({ _id: COMPANYIDFORMAT, sequence:1});
 
 companyIdService.findAndIncrement = (companyId) => companyIdModel.findOneAndUpdate(
         {_id: companyId },

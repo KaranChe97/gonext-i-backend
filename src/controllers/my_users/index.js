@@ -31,7 +31,7 @@ myUsers.createPurchaseInit = async(req, res, next) => {
     } catch(e){
         next(e);
     }
-}
+};
 
 myUsers.getOne = async (req, res, next) => {
     try{

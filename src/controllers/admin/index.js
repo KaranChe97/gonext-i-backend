@@ -2,10 +2,37 @@ const assert = require("assert");
 const { getAll, getOne, getByID, createOne, edit, deleteOne, checkCompanyId } = require("../../model/admin");
 const { createPurchaseId } = require("../../model/purchaseId");
 const { createCompanyId, findAndIncrement, isCollectionExist } = require("../../model/companyId");
-const { generateToken } = require("../../common/token");
+const { generateToken, generateRefreshToken } = require("../../common/token");
 const { compareData, generateHash } = require("../../common/hash");
-
+const { COMPANYIDFORMAT } = require('../../common/constants');
 const admin = {};
+
+
+// async function revokeToken({ token, ipAddress }) {
+//     const refreshToken = await getRefreshToken(token);
+
+//     // revoke token and save
+//     refreshToken.revoked = Date.now();
+//     refreshToken.revokedByIp = ipAddress;
+//     await refreshToken.save();
+// }
+
+
+// async function getRefreshTokens(userId) {
+//     // check that user exists
+//     await getUser(userId);
+
+//     // return refresh tokens for user
+//     const refreshTokens = await db.RefreshToken.find({ user: userId });
+//     return refreshTokens;
+// }
+
+// async function getRefreshToken(token) {
+//     const refreshToken = await db.RefreshToken.findOne({ token }).populate('user');
+//     if (!refreshToken || !refreshToken.isActive) throw 'Invalid token';
+//     return refreshToken;
+// }
+
 
 admin.getAll = async (req, res, next) => {
     try{
@@ -31,13 +58,15 @@ admin.login = async (req, res, next) => {
         {
             const isPasswordSame = await compareData(req.body.password, data.password);
             if(isPasswordSame){
-                const token = await generateToken(data._doc);
+                const token = await generateToken(data._doc); 
+                const refreshToken = await generateRefreshToken(data); 
                 res.status(200).json({
                     status : 1,
                     message : "success",
                     data : {
                         user : data,
-                        token
+                        token,
+                        refreshToken
                     }
                 });
             } else {
@@ -90,25 +119,26 @@ admin.create = async (req, res, next) => {
             }) 
         } else {
 
-            let isCompanyIdExists = await isCollectionExist("dc");
+            let isCompanyIdExists = await isCollectionExist(COMPANYIDFORMAT);
 
             let companyInit = "";
 
             if(!isCompanyIdExists) {
                 companyInit = await createCompanyId();
             } else {
-                companyInit = await findAndIncrement("dc");
+                companyInit = await findAndIncrement(COMPANYIDFORMAT);
             }
 
             req.body.companyId =  `${companyInit._id}${companyInit.sequence}`;
             await createPurchaseId({ _id: req.body.companyId, sequence: 0 });
             const data = await createOne(req.body);
             const token = await generateToken(data._doc);
-
+            const refreshToken = await generateRefreshToken(data); 
             res.status(200).json({
                 status : 1, 
                 message : "success",
                 token,
+                refreshToken,
                 data
             });
         }       

@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const admin = require("../model/admin");
+const refreshTokens = require("../model/refresh-token");
 
 const auth = async (req, res, next) => {
 	try {
@@ -17,7 +18,7 @@ const auth = async (req, res, next) => {
 					// eslint-disable-next-line no-underscore-dangle
 					req.body.gonextId = cb._id; 
 					req.body.gonextRole = cb.role;
-					next();
+					next(); 
 				} else {
 					throw new Error("user not found");
 				}

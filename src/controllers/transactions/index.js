@@ -202,8 +202,8 @@ transaction.getOutForDelivery =  async (req, res, next) => {
         const upcomingDelivery = await filterByDelivery(tomorrowArray);
         const inventoryData = await inventoryAll(gonextId);
             inventoryData.forEach((e) => {
-                todayStock.push({ itemId: e._id, name: e.name , needed: 0 })
-                upcomingStock.push({ itemId: e._id, name: e.name , needed: 0 })
+                todayStock.push({ itemId: e._id, name: e.name , unit: e.unit, instock: e.instock, needed: 0 })
+                upcomingStock.push({ itemId: e._id, name: e.name , unit: e.unit, instock: e.instock, needed: 0 })
             }
         ); 
         for(const i in todayDelivery) {
