@@ -5,7 +5,7 @@ const token = {};
 
 token.generateToken = (data) => { 
 	try { 
-		const userToken = jwt.sign(data, "cb$2%#nldvejrLootahHoldingngjrtui432y7ryfhneroafjslk093irosd812ewi", { expiresIn : "1m" });
+		const userToken = jwt.sign(data, "cb$2%#nldvejrLootahHoldingngjrtui432y7ryfhneroafjslk093irosd812ewi", { expiresIn : "12d" });
 		return userToken;
 	} catch (e) {
 		throw e;
@@ -20,8 +20,7 @@ token.generateRefreshToken = async (data) => {
 			user: data, 
 			role: data.role,
 			token: refreshToken,
-			// expires: new Date(Date.now() + 30*24*60*60*1000),
-			expires: new Date(Date.now() + 2*60*1000),
+			expires: new Date(Date.now() + 30*24*60*60*1000),
 		})
 		return refreshToken;
 	} catch(e) {
