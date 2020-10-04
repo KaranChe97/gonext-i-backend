@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const admin = require("../model/admin");
-const refreshTokens = require("../model/refresh-token");
 
 const auth = async (req, res, next) => {
 	try {
@@ -11,9 +10,9 @@ const auth = async (req, res, next) => {
 			token = token.slice(7, token.length); 
 			if (token) {
 				const data = jwt.verify(token, "cb$2%#nldvejrLootahHoldingngjrtui432y7ryfhneroafjslk093irosd812ewi");
+				if(data && data.role === "admin"){
 				// eslint-disable-next-line no-underscore-dangle
 				const cb = await admin.getByID(data._id);
-
 				if (cb) {
 					// eslint-disable-next-line no-underscore-dangle
 					req.body.gonextId = cb._id; 
@@ -22,6 +21,9 @@ const auth = async (req, res, next) => {
 				} else {
 					throw new Error("user not found");
 				}
+			} else if(role === "superadmin") {
+				console.log("superadmin requests");
+			}
 			} else {
 				throw new Error("Auth token is not supplied");
 			}

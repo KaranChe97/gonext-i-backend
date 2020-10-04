@@ -13,6 +13,7 @@ const transaction = require("./transaction");
 const analytics = require("./analytics");
 const units = require("./units");
 const token = require("./token");
+const category = require("./category");
 
 router.use("/admin", admin);
 router.use("/service", service);
@@ -21,6 +22,7 @@ router.use("/myusers", auth, myUsers);
 router.use("/transaction", auth, transaction);
 router.use("/analytics", auth, analytics);
 router.use("/units", units);
+router.use("/category", category);
 router.use("/token",token);
 
 router.post("/upload", async(req, res, next) => {

@@ -3,7 +3,6 @@ const app = require('./src/app');
 
 const port = process.env.PORT || 4000;
 mongoose.Promise = global.Promise;
-// mongodb+srv://batman:bat123@water-drop-rbwca.mongodb.net/test?retryWrites=true&w=majority
 mongoose.connect(process.env.DB, { useUnifiedTopology: true, useNewUrlParser: true }, (err) => {
     if (!err) {
         console.log('DB connection created successfully');

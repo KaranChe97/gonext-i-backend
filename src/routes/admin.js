@@ -11,4 +11,4 @@ router.delete('/', auth, deleteOne);
 router.patch('/changePassword', auth, changePassword);
 router.post('/forgetPassword', forgetPassword);
 
-module.exports = router
+module.exports = router;
