@@ -1,26 +1,16 @@
-const category = require("./categoryModal");
+const Category = require("./categoryModal");
 
 const categoryService = {};
 
-categoryService.findOne = (condition, metrics) => category.findOne(condition, metrics).exec();
-
-categoryService.getAll = (condition) => category.find({...condition});
-
-categoryService.findByIdAndUpdate = (id, metrics) => category.findByIdAndUpdate(id, metrics);
-
-categoryService.update = (condition, metrics, multi) => category.update(condition, metrics, multi);
-
-categoryService.createOne = (data) => category.create(data); 
-
-categoryService.createMany = (data) => category.insertMany(data);
+categoryService.findOne = (condition) => Category.find(condition).exec();
  
-categoryService.edit = (id, data) => category.findByIdAndUpdate({ _id : id }, data );
+categoryService.getAll = (condition) => Category.find({...condition}).sort({ name: 1 });
 
-categoryService.deleteOne = (id) => category.findByIdAndRemove({ _id : id });
+categoryService.createOne = (data) => Category.create(data);
 
-categoryService.deleteMany = (condition) => category.deleteMany(condition);
+categoryService.update = (id, data) => Category.findByIdAndUpdate({ _id: id }, data);
 
-categoryService.aggregate = (condition) => category.aggregate(condition);
+categoryService.deleteOne = (id) => Category.findByIdAndRemove({ _id: id });
 
 
 module.exports = categoryService; 

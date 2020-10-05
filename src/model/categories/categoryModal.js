@@ -1,28 +1,18 @@
 const mongoose = require("mongoose");
-const { slugify } = require('../../helpers');
 
 const CategorySchema = new mongoose.Schema({
         name: String,
-        slug: { type: String, index: true },
-        parent: {
-          type: mongoose.Schema.Types.ObjectId,
-          default: null,
-          ref: 'Category'
-        },
-        ancestors: [{
-             _id: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Category",
-                index: true
-        },
-             name: String,
-             slug: String
-        }]
+        orgId: { type: mongoose.Schema.Types.ObjectId } 
 });
 
-CategorySchema.pre('save', async function (next) {
-        this.slug = slugify(this.name);
-        next();
-});
+CategorySchema.pre('save', function (next) {
+        const words = this.name.split(' ')
+        this.name = words
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+          .join(' ')
+        next()
+    })
+
+CategorySchema.index({ name: 1, orgId: 1 },  { unique: true });
 
 module.exports = mongoose.model("category",CategorySchema);

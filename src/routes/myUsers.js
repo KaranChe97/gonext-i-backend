@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const auth = require("../middleware/auth");
 const { getAll , getOne , create, createPurchaseInit, edit , deleteOne, deleteCheck } = require("../controllers/my_users");
 
 router.post('/', create);

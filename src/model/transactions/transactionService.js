@@ -6,7 +6,7 @@ transactionService.getAll = (id) => transaction.find({organizationID: id});
 
 transactionService.filterBy = (filterArray, order) => transaction.find({
         $and:filterArray
-    }).sort({ _id: order});
+    }).sort({ _id: order}); 
 
 transactionService.filterByDelivery = (filterArray) => transaction.find({
         $and:filterArray

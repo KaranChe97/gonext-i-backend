@@ -1,18 +1,17 @@
-const assert = require("assert");
-const { createOne, getAll,  update, deleteOne } = require('../../model/categories');
+const assert = require('assert');
+const { update } = require('../../model/categories');
 
-const category = {};
+const { createOne,  updateTag, getAll, deleteTag } = require('../../model/tags');
 
-category.Create = async (req, res, next) => {
+const Tags = {};
+
+Tags.CreateTag = async (req, res, next) => {
     try {
-        const { name, gonextId } = req.body;
+        const { name } = req.body;
         assert(name, "name is required");
-        let data = await createOne({ 
-            name,
-            orgId: gonextId
-        });
+        let data = await createOne({name});
         if(data && data._id) {
-            let tags = await getAll({orgId: gonextId});
+            let tags = await getAll({});
             res.status(200).json({
                 data: tags,
                 status: 1,
@@ -31,16 +30,15 @@ category.Create = async (req, res, next) => {
         }
         if(e.code === 11000) {
             e.status = 200;
-            e.message = "Category already present";
+            e.message = "Tag already present";
         }
         next(e);
     }
 }
 
-category.getAll = async (req, res, next) => {
+Tags.getAll = async (req, res, next) => {
     try {     
-        const { gonextId } = req.body;
-        let data = await getAll({ orgId: gonextId });
+        let data = await getAll({});
         res.status(200).json({
             data,
             status: 1,
@@ -51,15 +49,15 @@ category.getAll = async (req, res, next) => {
     }
 }
 
-category.editCategory = async (req, res, next) => {
+Tags.editTag = async (req, res, next) => {
     try {
-        const { name , gonextId } = req.body;
-        const {categoryId} = req.query;
-        assert(categoryId, "categoryId is required");
+        const { name } = req.body;
+        const {tagId} = req.query;
+        assert(tagId, "tagId is required");
         assert(name, "name is required");
-        let data = await update(categoryId, {name});
+        let data = await updateTag( tagId, {name});
         if(data && data._id) {
-            let tags = await getAll({orgId: gonextId});
+            let tags = await getAll({});
             res.status(200).json({
                 data: tags,
                 status: 1,
@@ -79,14 +77,14 @@ category.editCategory = async (req, res, next) => {
     }
 }
 
-category.deleteCategory = async (req, res, next) => {
+Tags.deleteTag = async (req, res, next) => {
     try {
-        const { categoryId } = req.query;
-        assert( categoryId, "categoryId is required");
+        const { tagId } = req.query;
+        assert( tagId, "Id is required");
 
-        let data = await deleteOne(categoryId);
+        let data = await deleteTag(tagId);
         if(data && data._id) {
-            let tags = await getAll({ orgId: req.body.gonextId });
+            let tags = await getAll({});
             res.status(200).json({
                 data: tags,
                 status: 1,
@@ -106,5 +104,5 @@ category.deleteCategory = async (req, res, next) => {
     }
 }
 
- 
-module.exports = category;
+
+module.exports = Tags;

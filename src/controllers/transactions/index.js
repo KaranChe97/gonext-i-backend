@@ -12,7 +12,7 @@ const transaction = {};
 transaction.create = async (req, res, next) => {
     try{                           
         assert(req.body.companyId, "companyId is required"); 
-        console.log(req.body);    
+        console.log(req.body);     
         req.body.pendingAmount = 0; 
         req.body.paidAmount = 0;
         req.body.transactionStatus = 'new';

@@ -10,7 +10,7 @@ inventory.getAll = async (req, res, next) => {
         filterArray.push({ organizationID: gonextId });
         filterArray.push({"transactionCode": { "$in": [3]}});
         const data = await getAll(gonextId);
-        const deliveryData = await filterByDelivery(filterArray);
+        const deliveryData = await filterByDelivery(filterArray); 
         const neededStock = data.map(d => { return {
             itemId: d._id,
             name: d.name,
