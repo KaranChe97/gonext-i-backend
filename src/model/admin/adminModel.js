@@ -11,13 +11,16 @@ const adminSchema = new mongoose.Schema({
     phonenumber : {
         type : String
     },
-    password : {
+    password : { 
         type : String
     }, 
-    company : {
-        type : String
+    company: {
+        type : String 
     },
-    address : {
+    companyTags: [{
+        type: mongoose.ObjectId, ref: 'tags'
+    }], 
+    address : { 
         type : String
     },
     profilePic : {
