@@ -1,42 +1,57 @@
 const assert = require("assert");
 const { getAll, getByID, createOne, createMany, edit, deleteOne } = require("../../model/inventory");
 const inventoryModel = require("../../model/inventory/inventoryModel");
+const { getAll: getCategory } = require("../../model/categories");
+const categoryModal = require("../../model/categories/categoryModal");
 const { filterByDelivery } = require("../../model/transactions");
 const inventory = {};
 
 inventory.getAll = async (req, res, next) => {  
     try{
-        const filterArray = [];
-        const { gonextId }  = req.body;
-        filterArray.push({ organizationID: gonextId });
-        filterArray.push({"transactionCode": { "$in": [3]}});
-        const data = await getAll(gonextId); 
-        const deliveryData = await filterByDelivery(filterArray); 
-        const neededStock = data.map(d => { return {
-            itemId: d._id,
-            name: d.name,
-            needed: 0
-        }  });
-        for( const i in deliveryData){
-            const { items } = deliveryData[i];
-            for (const j in items){
-                let sIdx = neededStock.findIndex(e => e.itemId.equals(items[j].itemId));
-                if(sIdx > -1){
-                    neededStock[sIdx].needed += items[j].quantity
-                } else {
-                    neededStock.push({
-                        itemId: items[j].itemId,
-                        name: items[j].name,
-                        needed: items[j].quantity
-                    })
-                }
-            }
-        } 
+        const { gonextId }  = req.body; 
+        // const filterArray = [];
+        // filterArray.push({ organizationID: gonextId });
+        // filterArray.push({"transactionCode": { "$in": [3]}}); 
+        // const data = await inventoryModel.find({});   
+        let organizationID = gonextId.toString();
+
+        const groupedData = await inventoryModel.aggregate([ 
+            { $match: { organizationID } },
+            { $group: { _id: "$category", products: { $push: "$$ROOT" } } },
+            { $addFields: { category: "$_id" } }
+        ])
+
+        const data = await categoryModal.populate(groupedData, { path: 'category'});
+
+        const categories = await getCategory({ orgId: req.body.gonextId });
+
+        // const deliveryData = await filterByDelivery(filterArray);   
+        // const neededStock = data.map(d => { return {
+        //     itemId: d._id,
+        //     name: d.name,
+        //     needed: 0
+        // }  });
+        // for(const i in deliveryData){
+        //     const { items } = deliveryData[i];
+        //     for (const j in items){
+        //         let sIdx = neededStock.findIndex(e => e.itemId.equals(items[j].itemId));
+        //         if(sIdx > -1){
+        //             neededStock[sIdx].needed += items[j].quantity
+        //         } else {
+        //             neededStock.push({
+        //                 itemId: items[j].itemId,
+        //                 name: items[j].name,
+        //                 needed: items[j].quantity
+        //             })
+        //         }
+        //     }
+        // } 
         res.status(200).json({
             status : 1,
             message : "success",
             data,
-            neededStock,
+            categories
+            // neededStock,
         });
     }catch(e){
         next(e);

@@ -13,7 +13,7 @@ Tags.CreateTag = async (req, res, next) => {
         if(data && data._id) {
             let tags = await getAll({});
             res.status(200).json({
-                data: tags,
+                data: tags, 
                 status: 1,
                 message: 'Created successfully'           
             })

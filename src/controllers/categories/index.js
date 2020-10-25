@@ -1,6 +1,6 @@
 const assert = require("assert");
 const { createOne, getAll,  update, deleteOne } = require('../../model/categories');
-
+const Inventory = require('../../model/inventory/inventoryModel');  
 const category = {};
 
 category.Create = async (req, res, next) => {
@@ -29,9 +29,11 @@ category.Create = async (req, res, next) => {
         if(e.code === 'ERR_ASSERTION') {
             e.status = 200;
         }
-        if(e.code === 11000) {
-            e.status = 200;
-            e.message = "Category already present";
+        if(e.code === 11000) { 
+           return res.status(200).json({
+                status: 2,
+                message: "Category already present"
+            });     
         }
         next(e);
     }
@@ -74,7 +76,13 @@ category.editCategory = async (req, res, next) => {
     } catch(e) {
         if(e.code === 'ERR_ASSERTION') {
             e.status = 200;
-        }
+        } 
+        if(e.code === 11000) { 
+            return res.status(200).json({
+                 status: 2,
+                 message: "Category already present"
+             });     
+         }
         next(e);
     }
 }
@@ -85,6 +93,9 @@ category.deleteCategory = async (req, res, next) => {
         assert( categoryId, "categoryId is required");
 
         let data = await deleteOne(categoryId);
+
+        await Inventory.deleteMany({ category: categoryId });
+
         if(data && data._id) {
             let tags = await getAll({ orgId: req.body.gonextId });
             res.status(200).json({
@@ -94,7 +105,7 @@ category.deleteCategory = async (req, res, next) => {
             })
         } else {
             res.status(200).json({
-                status: 2,
+                status: 2, 
                 message: 'Failed'
             })
         }

@@ -2,7 +2,7 @@ const inventory = require("./inventoryModel");
 
 const inventoryService = {};
 
-inventoryService.getAll = (id) => inventory.find({organizationID: id});
+inventoryService.getAll = (id) => inventory.find({organizationID: id}).populate('category');
 
 inventoryService.getByID = (id) => inventory.findById({ _id : id });
 
