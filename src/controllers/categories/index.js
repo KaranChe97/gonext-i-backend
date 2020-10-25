@@ -42,7 +42,23 @@ category.Create = async (req, res, next) => {
 category.getAll = async (req, res, next) => {
     try {     
         const { gonextId } = req.body;
-        let data = await getAll({ orgId: gonextId });
+        const rawData = await getAll({ orgId: gonextId });
+        const organizationID = gonextId.toString();
+
+        const groupedData = await Inventory.aggregate([ 
+            { $match: { organizationID } },
+            { $group: { _id: "$category", products: { $push: "$$ROOT" } } },
+        ]);
+
+        const data= JSON.parse(JSON.stringify(rawData));
+
+        for(let i=0; i< groupedData.length; i++) {
+            let categoryIdx = data.findIndex(d => d._id === groupedData[i]._id.toString());
+            if(categoryIdx > -1) {        
+                data[categoryIdx]["products"] = groupedData[i].products;
+            }
+        }
+
         res.status(200).json({
             data,
             status: 1,
@@ -51,7 +67,7 @@ category.getAll = async (req, res, next) => {
     } catch(e) {
         next(e);
     }
-}
+} 
 
 category.editCategory = async (req, res, next) => {
     try {

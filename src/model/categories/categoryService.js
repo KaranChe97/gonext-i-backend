@@ -4,7 +4,7 @@ const categoryService = {};
 
 categoryService.findOne = (condition) => Category.find(condition).exec();
  
-categoryService.getAll = (condition) => Category.find({...condition}).sort({ name: 1 });
+categoryService.getAll = (condition) => Category.find({...condition}).sort({ name: 1 }).exec();
 
 categoryService.createOne = (data) => Category.create(data);
 

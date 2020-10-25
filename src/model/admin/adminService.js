@@ -16,4 +16,4 @@ adminService.deleteOne = (id) => admin.findByIdAndDelete({ _id : id });
 
 adminService.checkCompanyId = (companyId) => admin.findOne({ companyId });
 
-module.exports = adminService; 
+module.exports = adminService;  

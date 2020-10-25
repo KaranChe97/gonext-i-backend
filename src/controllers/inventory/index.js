@@ -24,7 +24,7 @@ inventory.getAll = async (req, res, next) => {
         const data = await categoryModal.populate(groupedData, { path: 'category'});
 
         const categories = await getCategory({ orgId: req.body.gonextId });
-
+ 
         // const deliveryData = await filterByDelivery(filterArray);   
         // const neededStock = data.map(d => { return {
         //     itemId: d._id,
@@ -54,12 +54,33 @@ inventory.getAll = async (req, res, next) => {
             // neededStock,
         });
     }catch(e){
-        next(e);
+        next(e); 
     }
 };
 
+inventory.getByCategory = async (req, res, next) => {
+    try {
+        const { categoryId } = req.params;
+        const { gonextId } = req.body; 
+        assert(categoryId, "categoryId is required")
+        let data = await inventoryModel.find({organizationID: gonextId, category: categoryId }).populate('category');
+        res.status(200).json({ 
+            status: 1,
+            message: 'success',
+            data
+        })
+
+    } catch(e) {
+        if(e.code === 'ERR_ASSERTION') {
+            e.status = 200;
+        }
+        next(e);
+    }
+}
+
 inventory.getOne = async (req, res, next) => {
     try{
+        console.log("called thus");
         const data = await getByID(req.params.itemId);        
         res.status(200).json({  
             status : 1,
