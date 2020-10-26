@@ -15,13 +15,15 @@ inventory.getAll = async (req, res, next) => {
         // const data = await inventoryModel.find({});   
         let organizationID = gonextId.toString();
 
-        const groupedData = await inventoryModel.aggregate([ 
-            { $match: { organizationID } },
-            { $group: { _id: "$category", products: { $push: "$$ROOT" } } },
-            { $addFields: { category: "$_id" } }
-        ])
+        const data = await inventoryModel.find({ organizationID }).populate('category');
 
-        const data = await categoryModal.populate(groupedData, { path: 'category'});
+        // inventoryModel.aggregate([ 
+        //     { $match: { organizationID } },
+        //     { $group: { _id: "$category", products: { $push: "$$ROOT" } } },
+        //     { $addFields: { category: "$_id" } }
+        // ])
+
+        // const data = await categoryModal.populate(groupedData, { path: 'category'});
 
         const categories = await getCategory({ orgId: req.body.gonextId });
  
@@ -80,7 +82,6 @@ inventory.getByCategory = async (req, res, next) => {
 
 inventory.getOne = async (req, res, next) => {
     try{
-        console.log("called thus");
         const data = await getByID(req.params.itemId);        
         res.status(200).json({  
             status : 1,
@@ -220,7 +221,7 @@ inventory.edit = async (req, res, next) => {
     try{
         const data = await edit(req.params.itemId, req.body);
         res.status(200).json({
-            status : 1,
+            status : 1, 
             message : "success",
             data
         });
