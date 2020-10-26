@@ -219,12 +219,20 @@ inventory.createMany = async (req, res, next) => {
 
 inventory.edit = async (req, res, next) => {
     try{
-        const data = await edit(req.params.itemId, req.body);
-        res.status(200).json({
-            status : 1, 
-            message : "success",
-            data
-        });
+        const saveStatus = await edit(req.params.itemId, req.body);
+        if(saveStatus) {
+            const data = await getByID(req.params.itemId);          
+            res.status(200).json({
+                status : 1, 
+                message : "success",
+                data
+            });
+        } else {
+            res.status(200).json({
+                status: 2,
+                message: 'Not saved'
+            })
+        }
     }catch(e){
         next(e);
     }
