@@ -13,8 +13,9 @@ inventory.getAll = async (req, res, next) => {
         // filterArray.push({ organizationID: gonextId });
         // filterArray.push({"transactionCode": { "$in": [3]}}); 
         // const data = await inventoryModel.find({});   
-        let organizationID = gonextId.toString();
+        let organizationID = gonextId.toString(); 
 
+        console.log("=============================",organizationID);
         const data = await inventoryModel.find({ organizationID }).populate('category');
 
         // inventoryModel.aggregate([ 
@@ -82,6 +83,7 @@ inventory.getByCategory = async (req, res, next) => {
 
 inventory.getOne = async (req, res, next) => {
     try{
+        console.log("called wrongly");
         const data = await getByID(req.params.itemId);        
         res.status(200).json({  
             status : 1,
@@ -227,7 +229,7 @@ inventory.edit = async (req, res, next) => {
                 message : "success",
                 data
             });
-        } else {
+        } else {    
             res.status(200).json({
                 status: 2,
                 message: 'Not saved'

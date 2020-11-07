@@ -49,7 +49,7 @@ category.getAll = async (req, res, next) => {
             { $match: { organizationID } },
             { $group: { _id: "$category", products: { $push: "$$ROOT" } } },
         ]);
-
+ 
         const data= JSON.parse(JSON.stringify(rawData));
 
         for(let i=0; i< groupedData.length; i++) {
